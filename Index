@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Comunitario</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #111;
+      color: white;
+      padding: 1rem 2rem;
+      text-align: center;
+    }
+    main {
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+    }
+    form textarea {
+      width: 100%;
+      height: 150px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    form button {
+      padding: 0.5rem 1rem;
+      background: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .post {
+      background: white;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Blog Comunitario</h1>
+  </header>
+  <main>
+    <form id="postForm">
+      <textarea id="content" placeholder="Escribe tu historia o fragmento aquí..."></textarea>
+      <button type="submit">Publicar</button>
+    </form>
+    <div id="posts"></div>
+  </main>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDiH8j-OkJNNygwON8z_v5jAxkYWdYG9oM",
+      authDomain: "inna-54e0b.firebaseapp.com",
+      databaseURL: "https://inna-54e0b-default-rtdb.firebaseio.com",
+      projectId: "inna-54e0b",
+      storageBucket: "inna-54e0b.firebasestorage.app",
+      messagingSenderId: "207948784382",
+      appId: "1:207948784382:web:efc39d608db5eab8023baf"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const postsRef = collection(db, "posts");
+
+    const postForm = document.getElementById("postForm");
+    const contentInput = document.getElementById("content");
+    const postsContainer = document.getElementById("posts");
+
+    postForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (contentInput.value.trim()) {
+        await addDoc(postsRef, { text: contentInput.value.trim(), created: new Date() });
+        contentInput.value = "";
+        loadPosts();
+      }
+    });
+
+    async function loadPosts() {
+      postsContainer.innerHTML = "";
+      const snapshot = await getDocs(postsRef);
+      snapshot.forEach(doc => {
+        const post = document.createElement("div");
+        post.className = "post";
+        post.textContent = doc.data().text;
+        postsContainer.appendChild(post);
+      });
+    }
+
+    loadPosts();
+  </script></body>
+</html>
